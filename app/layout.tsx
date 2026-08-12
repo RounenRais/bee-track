@@ -8,10 +8,30 @@ const geist = Geist({
   subsets: ["latin"],
 });
 
+const title = "BeeTrack — Akıllı Kovan Takip Sistemi";
+const description =
+  "BeeTrack, arı kolonilerinizi uzaktan izlemenizi sağlayan akıllı kovan takip sistemidir. Oğul uyarısı, hasat tahmini ve koloni sağlığı takibi tek bir platformda.";
+
 export const metadata: Metadata = {
-  title: "BeeTrack — Akıllı Kovan Takip Sistemi",
-  description:
-    "BeeTrack, arı kolonilerinizi uzaktan izlemenizi sağlayan akıllı kovan takip sistemidir. Oğul uyarısı, hasat tahmini ve koloni sağlığı takibi tek bir platformda.",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://beetrackapp.com"
+  ),
+  title,
+  description,
+  openGraph: {
+    title,
+    description,
+    siteName: "BeeTrack",
+    locale: "tr_TR",
+    type: "website",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "BeeTrack" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({

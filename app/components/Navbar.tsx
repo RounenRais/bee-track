@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 const navLinks = [
   { label: "Sorun", href: "#sorun" },
@@ -18,9 +19,16 @@ export default function Navbar() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-navy/40">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
         {/* Logo */}
-        <a href="#" className="flex items-center gap-2">
-          <HexLogo />
-          <span className="text-xl font-bold text-gold tracking-wide">BeeTrack</span>
+        <a href="#" className="flex items-center" aria-label="BeeTrack ana sayfa">
+          <Image
+            src="/logo-dark.png"
+            alt="BeeTrack"
+            width={790}
+            height={291}
+            priority
+            sizes="120px"
+            className="h-9 w-auto"
+          />
         </a>
 
         {/* Desktop links */}
@@ -96,14 +104,5 @@ export default function Navbar() {
         </div>
       )}
     </header>
-  );
-}
-
-function HexLogo() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-      <polygon points="14,2 26,8.5 26,21.5 14,28 2,21.5 2,8.5" fill="#F5A623" opacity="0.9" />
-      <text x="14" y="18" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#111827">B</text>
-    </svg>
   );
 }

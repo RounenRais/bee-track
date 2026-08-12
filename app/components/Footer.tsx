@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function Footer() {
   return (
     <footer className="bg-gray-900 border-t border-white/10 py-14 px-4 sm:px-6 lg:px-8">
@@ -5,9 +7,15 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
           {/* Brand */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <HexLogo />
-              <span className="text-xl font-bold text-gold">BeeTrack</span>
+            <div className="mb-4">
+              <Image
+                src="/logo-dark.png"
+                alt="BeeTrack"
+                width={790}
+                height={291}
+                sizes="140px"
+                className="h-10 w-auto"
+              />
             </div>
             <p className="text-sm text-gray-400 leading-relaxed max-w-xs">
               Arıcıların gözü, kovanın sesi. Akıllı sensörler ve yapay zeka
@@ -98,15 +106,6 @@ function SocialLink({ href, label, children }: { href: string; label: string; ch
 }
 
 /* Icons */
-function HexLogo() {
-  return (
-    <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
-      <polygon points="14,2 26,8.5 26,21.5 14,28 2,21.5 2,8.5" fill="#F5A623" opacity="0.9" />
-      <text x="14" y="18" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#111827">B</text>
-    </svg>
-  );
-}
-
 function MailIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">

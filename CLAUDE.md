@@ -27,7 +27,7 @@ app/
 Section Details:
 Hero → Full screen dark section. Large "BeeTrack" heading in gold. Subtitle: "Arıcının gözü, kovanın sesi." Two CTA buttons: "Erken Erişim İste" (gold, filled) and "Nasıl Çalışır?" (outlined). Animated honeycomb hexagons on the right side as decoration.
 Problem → Three cards side by side. 01 Oğul Kaybı, 02 Gereksiz Ziyaretler, 03 Hasat Belirsizliği. Each card has a large number, title and short description. Dark navy cards.
-Solution / How It Works → Horizontal flow diagram showing: Sensör Kutusu → LoRa → Raspberry Pi → GSM/Bulut → Mobil Uygulama. Connected with arrows. Below it, feature tags: Ağırlık Takibi, Sıcaklık, Titreşim, Hava Durumu, YZ Analizi.
+Solution / How It Works → Horizontal flow diagram showing: Sensör Kutusu → LoRa → ESP32 → GSM/Bulut → Mobil Uygulama. Connected with arrows. Below it, feature tags: Ağırlık Takibi, Sıcaklık, Titreşim, Hava Durumu, YZ Analizi.
 Features → Grid of 6 feature cards with icons. Oğul Erken Uyarısı, Hasat Zamanı Tahmini, Koloni Sağlığı Takibi, Hava Durumu Entegrasyonu, Uzaktan İzleme, Kolay Kurulum.
 HowItWorks → Numbered steps: 1. Sensör kutusunu kovanın altına yerleştir 2. Merkezi istasyonu arılığa kur 3. Mobil uygulamayı indir 4. Kovanlarını telefonundan takip et.
 Pricing → Three pricing cards: Bireysel (kovan başına aylık 150-200₺), Kooperatif (toplu paket, özel fiyat), Kurumsal (araştırma kurumları için). Middle card highlighted in gold as "En Popüler".

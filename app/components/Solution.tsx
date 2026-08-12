@@ -3,7 +3,7 @@ import Image from "next/image";
 const flowSteps = [
   { label: "Sensör Kutusu", icon: SensorIcon, desc: "Ağırlık, sıcaklık, titreşim" },
   { label: "LoRa", icon: LoraIcon, desc: "Düşük güç, uzun menzil" },
-  { label: "Raspberry Pi", icon: RpiIcon, desc: "Merkezi işlem birimi" },
+  { label: "ESP32", icon: Esp32Icon, desc: "Merkezi işlem birimi" },
   { label: "GSM / Bulut", icon: CloudIcon, desc: "Güvenli veri aktarımı" },
   { label: "Mobil Uygulama", icon: MobileIcon, desc: "iOS & Android" },
 ];
@@ -50,10 +50,13 @@ export default function Solution() {
                   </div>
                 </div>
                 {i < flowSteps.length - 1 && (
-                  <div className="flex items-center justify-start w-full max-w-sm pl-7 my-1">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                      <path d="M12 4v16M4 12l8 8 8-8" stroke="#F5A623" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
+                  <div className="w-full max-w-sm my-1">
+                    {/* genişlik, üstteki altıgen ikonla birebir aynı → ok tam ortada kalır */}
+                    <div className="w-14 flex justify-center">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 4v16M4 12l8 8 8-8" stroke="#F5A623" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
                   </div>
                 )}
               </div>
@@ -115,14 +118,20 @@ function LoraIcon() {
   );
 }
 
-function RpiIcon() {
+function Esp32Icon() {
   return (
     <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
-      <rect x="5" y="7" width="18" height="14" rx="2" stroke="#F5A623" strokeWidth="1.8" fill="none" />
-      <rect x="9" y="11" width="10" height="6" rx="1" stroke="#F5A623" strokeWidth="1.5" fill="none" />
-      <line x1="9" y1="7" x2="9" y2="4" stroke="#F5A623" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="14" y1="7" x2="14" y2="4" stroke="#F5A623" strokeWidth="1.5" strokeLinecap="round" />
-      <line x1="19" y1="7" x2="19" y2="4" stroke="#F5A623" strokeWidth="1.5" strokeLinecap="round" />
+      {/* modül kartı */}
+      <rect x="7" y="4" width="14" height="20" rx="1.5" stroke="#F5A623" strokeWidth="1.8" fill="none" />
+      {/* PCB anten */}
+      <path d="M10 7h3v2.2h-3v2.2h3" stroke="#F5A623" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      {/* metal kapak */}
+      <rect x="9.5" y="13.5" width="9" height="7" rx="1" stroke="#F5A623" strokeWidth="1.5" fill="none" />
+      {/* pin başlıkları */}
+      <line x1="4.5" y1="15" x2="7" y2="15" stroke="#F5A623" strokeWidth="1.4" strokeLinecap="round" />
+      <line x1="4.5" y1="18.5" x2="7" y2="18.5" stroke="#F5A623" strokeWidth="1.4" strokeLinecap="round" />
+      <line x1="21" y1="15" x2="23.5" y2="15" stroke="#F5A623" strokeWidth="1.4" strokeLinecap="round" />
+      <line x1="21" y1="18.5" x2="23.5" y2="18.5" stroke="#F5A623" strokeWidth="1.4" strokeLinecap="round" />
     </svg>
   );
 }
