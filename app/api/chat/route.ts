@@ -1,28 +1,20 @@
-import { BEETRACK_KNOWLEDGE_BASE } from '../../lib/knowledge-base'
+import { BEETRACK_KNOWLEDGE_BASE } from '../../lib/knowledge-base';
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY;
 
 const GROQ_MODEL =
-  process.env.GROQ_MODEL || 'llama3-70b-8192';
-
-const SITE_URL = process.env.SITE_URL || '';
-const SITE_NAME = process.env.SITE_NAME || 'BeeTrack';
+  process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
 
 const OUT_OF_SCOPE_REPLY =
-  'Bu konuda yardımcı olamıyorum — ben yalnızca BeeTrack projesi hakkındaki sorulara cevap veren bir asistanım. ' +
-  'Proje hakkında bir soru sorabilir ya da ekiple iletişime geçebilirsiniz.';
+  'Bu konuda yardımcı olamıyorum — ben yalnızca BeeTrack projesi hakkındaki sorulara cevap veren bir asistanım.';
 
 const SYSTEM_PROMPT = `
 Sen BeeTrack projesinin resmi web sitesinde çalışan,
-DAR KAPSAMLI bir asistansın.
+dar kapsamlı bir asistansın.
 
-SENİN TEK GÖREVİN:
-Ziyaretçilerin BeeTrack projesi hakkındaki sorularını,
-aşağıda verilen bilgi tabanına dayanarak yanıtlamak.
+Yalnızca BeeTrack projesiyle ilgili soruları cevapla.
 
-KAPSAM KURALI:
-
-- Yalnızca BeeTrack projesiyle doğrudan ilgili sorulara cevap ver.
+Kapsam:
 - Donanım
 - Sensörler
 - Ölçüm sistemi
@@ -38,15 +30,13 @@ KAPSAM KURALI:
 Kapsam dışındaki soruları cevaplama.
 
 Kapsam dışı soru geldiğinde:
-
 "Bu konuda yardımcı olamıyorum — ben yalnızca BeeTrack projesi hakkında sorulara cevap veren bir asistanım."
+de.
 
-şeklinde cevap ver.
+BeeTrack hakkında sorulan bilgi aşağıdaki bilgi tabanında yoksa
+kesinlikle bilgi uydurma.
 
-Bilgi tabanında olmayan bir BeeTrack konusu sorulursa bilgi uydurma.
-Bilginin mevcut olmadığını söyle ve ekiple iletişime geçmesini öner.
-
-Kısa, anlaşılır ve samimi Türkçe kullan.
+Kısa, anlaşılır ve Türkçe cevap ver.
 
 ---
 
@@ -55,14 +45,16 @@ BİLGİ TABANI:
 ${BEETRACK_KNOWLEDGE_BASE}
 `;
 
-export async function POST(request) {
+export async function POST(request: Request) {
   try {
+    console.log('✅ /api/chat isteği geldi');
+
     if (!GROQ_API_KEY) {
-      console.error('GROQ_API_KEY tanımlı değil.');
+      console.error('❌ GROQ_API_KEY bulunamadı');
 
       return Response.json(
         {
-          error: 'Sunucu yapılandırma hatası.',
+          error: 'GROQ_API_KEY tanımlı değil.',
         },
         {
           status: 500,
@@ -71,7 +63,6 @@ export async function POST(request) {
     }
 
     const body = await request.json();
-
     const { messages } = body;
 
     if (!Array.isArray(messages) || messages.length === 0) {
@@ -85,11 +76,11 @@ export async function POST(request) {
       );
     }
 
-    // Client'ın system/developer rolü göndermesine izin vermiyoruz.
     const safeMessages = messages
       .filter(
         (message) =>
-          (message.role === 'user' || message.role === 'assistant') &&
+          (message.role === 'user' ||
+            message.role === 'assistant') &&
           typeof message.content === 'string'
       )
       .slice(-20)
@@ -109,7 +100,7 @@ export async function POST(request) {
       );
     }
 
-    const openRouterMessages = [
+    const groqMessages = [
       {
         role: 'system',
         content: SYSTEM_PROMPT,
@@ -117,31 +108,23 @@ export async function POST(request) {
       ...safeMessages,
     ];
 
+    console.log('🤖 Groq modeli:', GROQ_MODEL);
+
     const response = await fetch(
-      'https://openrouter.ai/api/v1/chat/completions',
+      'https://api.groq.com/openai/v1/chat/completions',
       {
         method: 'POST',
 
         headers: {
           'Content-Type': 'application/json',
-
           Authorization: `Bearer ${GROQ_API_KEY}`,
-
-          ...(SITE_URL && {
-            'HTTP-Referer': SITE_URL,
-          }),
-
-          ...(SITE_NAME && {
-            'X-OpenRouter-Title': SITE_NAME,
-          }),
         },
 
         body: JSON.stringify({
           model: GROQ_MODEL,
-
-          max_tokens: 1000,
-
-          messages: openRouterMessages,
+          messages: groqMessages,
+          temperature: 0.2,
+          max_completion_tokens: 1000,
         }),
       }
     );
@@ -149,36 +132,37 @@ export async function POST(request) {
     if (!response.ok) {
       const errorText = await response.text();
 
-      console.error(
-        'OpenRouter API hatası:',
-        response.status,
-        errorText
-      );
+      console.error('======================');
+      console.error('❌ GROQ API HATASI');
+      console.error('Status:', response.status);
+      console.error('Body:', errorText);
+      console.error('======================');
 
       return Response.json(
         {
           error: 'Yapay zeka servisine ulaşılamadı.',
+          groqStatus: response.status,
+          detail: errorText,
         },
         {
-          status: 502,
+          status: response.status,
         }
       );
     }
 
     const data = await response.json();
 
-    let reply =
-      data?.choices?.[0]?.message?.content?.trim();
+    console.log('✅ Groq cevabı alındı');
 
-    if (!reply) {
-      reply = OUT_OF_SCOPE_REPLY;
-    }
+    const reply =
+      data?.choices?.[0]?.message?.content?.trim() ||
+      OUT_OF_SCOPE_REPLY;
 
     return Response.json({
       reply,
     });
   } catch (error) {
-    console.error('Chat API hatası:', error);
+    console.error('❌ Chat API hatası:', error);
 
     return Response.json(
       {
