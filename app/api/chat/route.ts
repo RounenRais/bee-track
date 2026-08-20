@@ -1,9 +1,9 @@
 import { BEETRACK_KNOWLEDGE_BASE } from '../../lib/knowledge-base';
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY;
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
-const GROQ_MODEL =
-  process.env.GROQ_MODEL || 'openai/gpt-oss-120b';
+const ANTHROPIC_MODEL =
+  process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001';
 
 const OUT_OF_SCOPE_REPLY =
   'Bu konuda yardımcı olamıyorum — ben yalnızca BeeTrack projesi hakkındaki sorulara cevap veren bir asistanım.';
@@ -49,12 +49,12 @@ export async function POST(request: Request) {
   try {
     console.log('✅ /api/chat isteği geldi');
 
-    if (!GROQ_API_KEY) {
-      console.error('❌ GROQ_API_KEY bulunamadı');
+    if (!ANTHROPIC_API_KEY) {
+      console.error('❌ ANTHROPIC_API_KEY bulunamadı');
 
       return Response.json(
         {
-          error: 'GROQ_API_KEY tanımlı değil.',
+          error: 'ANTHROPIC_API_KEY tanımlı değil.',
         },
         {
           status: 500,
@@ -100,31 +100,25 @@ export async function POST(request: Request) {
       );
     }
 
-    const groqMessages = [
-      {
-        role: 'system',
-        content: SYSTEM_PROMPT,
-      },
-      ...safeMessages,
-    ];
-
-    console.log('🤖 Groq modeli:', GROQ_MODEL);
+    console.log('🤖 Anthropic modeli:', ANTHROPIC_MODEL);
 
     const response = await fetch(
-      'https://api.groq.com/openai/v1/chat/completions',
+      'https://api.anthropic.com/v1/messages',
       {
         method: 'POST',
 
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${GROQ_API_KEY}`,
+          'x-api-key': ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01',
         },
 
         body: JSON.stringify({
-          model: GROQ_MODEL,
-          messages: groqMessages,
+          model: ANTHROPIC_MODEL,
+          system: SYSTEM_PROMPT,
+          messages: safeMessages,
           temperature: 0.2,
-          max_completion_tokens: 1000,
+          max_tokens: 1000,
         }),
       }
     );
@@ -133,7 +127,7 @@ export async function POST(request: Request) {
       const errorText = await response.text();
 
       console.error('======================');
-      console.error('❌ GROQ API HATASI');
+      console.error('❌ ANTHROPIC API HATASI');
       console.error('Status:', response.status);
       console.error('Body:', errorText);
       console.error('======================');
@@ -141,7 +135,7 @@ export async function POST(request: Request) {
       return Response.json(
         {
           error: 'Yapay zeka servisine ulaşılamadı.',
-          groqStatus: response.status,
+          anthropicStatus: response.status,
           detail: errorText,
         },
         {
@@ -152,11 +146,10 @@ export async function POST(request: Request) {
 
     const data = await response.json();
 
-    console.log('✅ Groq cevabı alındı');
+    console.log('✅ Anthropic cevabı alındı');
 
     const reply =
-      data?.choices?.[0]?.message?.content?.trim() ||
-      OUT_OF_SCOPE_REPLY;
+      data?.content?.[0]?.text?.trim() || OUT_OF_SCOPE_REPLY;
 
     return Response.json({
       reply,
